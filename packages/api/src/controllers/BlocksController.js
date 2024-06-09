@@ -1,7 +1,7 @@
 const BlocksDAO = require('../dao/BlocksDAO')
 
 class BlocksController {
-  constructor (knex) {
+  constructor(knex) {
     this.blocksDAO = new BlocksDAO(knex)
   }
 
@@ -9,6 +9,19 @@ class BlocksController {
     const { hash } = request.params
 
     const block = await this.blocksDAO.getBlockByHash(hash)
+
+    if (!block) {
+      return response.status(404).send({ message: 'not found' })
+    }
+
+    response.send(block)
+  }
+
+  getBlockByValidator = async (request, response) => {
+    const { validator } = request.params
+    const { page = 1, limit = 10, order = 'asc' } = request.query
+    console.log(typeof limit)
+    const block = await this.blocksDAO.getBlockByValidator(validator, Number(page), Number(limit), order)
 
     if (!block) {
       return response.status(404).send({ message: 'not found' })

@@ -4,7 +4,7 @@ const supertest = require('supertest')
 const server = require('../../src/server')
 const fixtures = require('../utils/fixtures')
 const { getKnex } = require('../../src/utils')
-
+require('dotenv').config()
 describe('Blocks routes', () => {
   let app
   let client
@@ -64,12 +64,191 @@ describe('Blocks routes', () => {
     })
   })
 
+  describe('getBlockByValidator()', async () => {
+    it('should return blocks by validator', async () => {
+      const [block] = blocks
+
+      const { body } = await client.get(`/block/validator/${block.validator}`)
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+
+      assert.equal(body.pagination.page, 1)
+      assert.equal(body.pagination.limit, 10)
+
+      const expectedBlocks = blocks
+        .filter(a => a.validator === block.validator)
+        .map(row => ({
+          header: {
+            hash: row.hash,
+            height: row.height,
+            timestamp: row.timestamp.toISOString(),
+            blockVersion: row.block_version,
+            appVersion: row.app_version,
+            l1LockedHeight: row.l1_locked_height,
+            validator: row.validator
+          },
+          txs: []
+        }))
+      assert.deepEqual(expectedBlocks, body.resultSet)
+    })
+
+    it('should return default set of blocks order desc', async () => {
+      const [block] = blocks
+
+      const { body } = await client.get(`/block/validator/${block.validator}?order=desc`)
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+
+      assert.equal(body.pagination.page, 1)
+      assert.equal(body.pagination.limit, 10)
+
+      const expectedBlocks = blocks
+        .filter(a => a.validator === block.validator)
+        .map(row => ({
+          header: {
+            hash: row.hash,
+            height: row.height,
+            timestamp: row.timestamp.toISOString(),
+            blockVersion: row.block_version,
+            appVersion: row.app_version,
+            l1LockedHeight: row.l1_locked_height,
+            validator: row.validator
+          },
+          txs: []
+        }))
+      assert.deepEqual(expectedBlocks, body.resultSet)
+    })
+
+
+    it('should be able to walk through pages', async () => {
+      const [block] = blocks
+
+      const { body } = await client.get(`/block/validator/${block.validator}?page=2`)
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+
+      assert.equal(body.pagination.page, 2)
+      assert.equal(body.pagination.limit, 10)
+      assert.equal(body.pagination.total, blocks.length)
+
+      const expectedBlocks = blocks
+        .filter(a => a.validator === block.validator)
+        .map(row => ({
+          header: {
+            hash: row.hash,
+            height: row.height,
+            timestamp: row.timestamp.toISOString(),
+            blockVersion: row.block_version,
+            appVersion: row.app_version,
+            l1LockedHeight: row.l1_locked_height,
+            validator: row.validator
+          },
+          txs: []
+        }))
+      assert.deepEqual(expectedBlocks, body.resultSet)
+    })
+
+    it('should return custom page size', async () => {
+      const [block] = blocks
+
+      const { body } = await client.get(`/block/validator/${block.validator}?limit=2`)
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+
+      assert.equal(body.pagination.page, 1)
+      assert.equal(body.pagination.limit, 2)
+      assert.equal(body.pagination.total, blocks.length)
+
+      const expectedBlocks = blocks
+        .filter(a => a.validator === block.validator)
+        .map(row => ({
+          header: {
+            hash: row.hash,
+            height: row.height,
+            timestamp: row.timestamp.toISOString(),
+            blockVersion: row.block_version,
+            appVersion: row.app_version,
+            l1LockedHeight: row.l1_locked_height,
+            validator: row.validator
+          },
+          txs: []
+        })).slice(0, 2)
+      assert.deepEqual(expectedBlocks, body.resultSet)
+    })
+
+    it('should allow to walk through pages with custom page size', async () => {
+      const [block] = blocks
+
+      const { body } = await client.get(`/block/validator/${block.validator}?limit=2&page=2`)
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+
+      assert.equal(body.pagination.page, 2)
+      assert.equal(body.pagination.limit, 2)
+      assert.equal(body.pagination.total, blocks.length)
+
+      const expectedBlocks = blocks
+        .filter(a => a.validator === block.validator)
+        .map(row => ({
+          header: {
+            hash: row.hash,
+            height: row.height,
+            timestamp: row.timestamp.toISOString(),
+            blockVersion: row.block_version,
+            appVersion: row.app_version,
+            l1LockedHeight: row.l1_locked_height,
+            validator: row.validator
+          },
+          txs: []
+        })).slice(0, 2)
+      assert.deepEqual(expectedBlocks, body.resultSet)
+    })
+
+    it('should allow to walk through pages with custom page size desc', async () => {
+      const [block] = blocks
+
+      const { body } = await client.get(`/block/validator/${block.validator}?limit=2&page=2&order=desc`)
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+
+      assert.equal(body.pagination.page, 2)
+      assert.equal(body.pagination.limit, 2)
+      assert.equal(body.pagination.total, blocks.length)
+
+      const expectedBlocks = blocks
+        .filter(a => a.validator === block.validator)
+        .map(row => ({
+          header: {
+            hash: row.hash,
+            height: row.height,
+            timestamp: row.timestamp.toISOString(),
+            blockVersion: row.block_version,
+            appVersion: row.app_version,
+            l1LockedHeight: row.l1_locked_height,
+            validator: row.validator
+          },
+          txs: []
+        })).slice(0, 2)
+      assert.deepEqual(expectedBlocks, body.resultSet)
+    })
+
+    it('should return less items when there is none on the one bound', async () => {
+      const [block] = blocks
+
+      const { body } = await client.get(`/block/validator/${block.validator}?limit=20&page=99&order=desc`)
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+      console.log(body.pagination)
+      const expectedBlocks = []
+      assert.deepEqual(expectedBlocks, body.resultSet)
+    })
+  })
+
   describe('getBlocks()', async () => {
     it('should return default set of blocks', async () => {
       const { body } = await client.get('/blocks')
         .expect(200)
         .expect('Content-Type', 'application/json; charset=utf-8')
-
       assert.equal(body.pagination.page, 1)
       assert.equal(body.pagination.limit, 10)
       assert.equal(body.pagination.total, blocks.length)
