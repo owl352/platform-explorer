@@ -20,7 +20,11 @@ class BlocksController {
   getBlockByValidator = async (request, response) => {
     const { validator } = request.params
     const { page = 1, limit = 10, order = 'asc' } = request.query
-    console.log(typeof limit)
+
+    if (order !== 'asc' && order !== 'desc') {
+      return response.status(400).send({ message: `invalid ordering value ${order}. only 'asc' or 'desc' is valid values` })
+    }
+
     const block = await this.blocksDAO.getBlockByValidator(validator, Number(page), Number(limit), order)
 
     if (!block) {

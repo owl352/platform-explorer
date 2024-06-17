@@ -81,8 +81,8 @@ module.exports = class BlockDAO {
   }
 
   getBlockByValidator = async (validator, page, limit, order) => {
-    const fromRank = ((page - 1) * limit) + 1;
-    const toRank = fromRank + limit - 1;
+    const fromRank = ((page - 1) * limit) + 1
+    const toRank = fromRank + limit - 1
 
     const subquery = this.knex('blocks')
       .select(
@@ -93,18 +93,18 @@ module.exports = class BlockDAO {
         'blocks.app_version as app_version',
         'blocks.l1_locked_height as l1_locked_height',
         'blocks.validator as validator',
-        this.knex.raw(`rank() over (partition by blocks.validator order by blocks.height desc) as rank`)
+        this.knex.raw(`rank() over (partition by blocks.validator order by blocks.height ${order}) as rank`)
       )
       .where('blocks.validator', validator)
       .as('blocks');
+
     const rows = await this.knex(subquery)
       .select(this.knex('blocks').count('height').as('total_count').where('blocks.validator', validator),
         'blocks.hash as hash', 'height', 'timestamp', 'block_version',
         'app_version', 'l1_locked_height', 'state_transitions.hash as st_hash', 'validator')
-      .leftJoin('state_transitions', 'state_transitions.block_hash', 'blocks.hash')
       .whereBetween('rank', [fromRank, toRank])
-      .orderBy('blocks.height', order);
-
+      .orderBy('blocks.height', order)
+      .leftJoin('state_transitions', 'state_transitions.block_hash', 'blocks.hash')
 
     const totalCount = rows.length > 0 ? Number(rows[0].total_count) : 0;
 

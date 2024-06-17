@@ -4,6 +4,8 @@ const supertest = require('supertest')
 const server = require('../../src/server')
 const fixtures = require('../utils/fixtures')
 const { getKnex } = require('../../src/utils')
+const crypto = require('crypto')
+
 require('dotenv').config()
 describe('Blocks routes', () => {
   let app
@@ -24,6 +26,15 @@ describe('Blocks routes', () => {
 
     for (let i = 1; i < 31; i++) {
       block = await fixtures.block(knex, { height: i + 1 })
+      blocks.push(block)
+    }
+
+    //? Duplicates for validator tests
+    for (let i = 31; i < 54; i++) {
+      block = await fixtures.block(knex, {
+        validator: blocks[0].validator,
+        height: i + 1
+      })
       blocks.push(block)
     }
   })
@@ -77,6 +88,7 @@ describe('Blocks routes', () => {
 
       const expectedBlocks = blocks
         .filter(a => a.validator === block.validator)
+        .slice(0, 10)
         .map(row => ({
           header: {
             hash: row.hash,
@@ -93,6 +105,7 @@ describe('Blocks routes', () => {
     })
 
     it('should return default set of blocks order desc', async () => {
+
       const [block] = blocks
 
       const { body } = await client.get(`/block/validator/${block.validator}?order=desc`)
@@ -104,6 +117,8 @@ describe('Blocks routes', () => {
 
       const expectedBlocks = blocks
         .filter(a => a.validator === block.validator)
+        .sort((a, b) => b.height - a.height)
+        .slice(0, 10)
         .map(row => ({
           header: {
             hash: row.hash,
@@ -129,10 +144,11 @@ describe('Blocks routes', () => {
 
       assert.equal(body.pagination.page, 2)
       assert.equal(body.pagination.limit, 10)
-      assert.equal(body.pagination.total, blocks.length)
+      assert.equal(body.pagination.total, 24)
 
       const expectedBlocks = blocks
         .filter(a => a.validator === block.validator)
+        .slice(10, 20)
         .map(row => ({
           header: {
             hash: row.hash,
@@ -157,10 +173,12 @@ describe('Blocks routes', () => {
 
       assert.equal(body.pagination.page, 1)
       assert.equal(body.pagination.limit, 2)
-      assert.equal(body.pagination.total, blocks.length)
+      assert.equal(body.pagination.total, 24)
 
       const expectedBlocks = blocks
+        .sort((a, b) => a.height - b.height)
         .filter(a => a.validator === block.validator)
+        .slice(0, 2)
         .map(row => ({
           header: {
             hash: row.hash,
@@ -172,7 +190,7 @@ describe('Blocks routes', () => {
             validator: row.validator
           },
           txs: []
-        })).slice(0, 2)
+        }))
       assert.deepEqual(expectedBlocks, body.resultSet)
     })
 
@@ -185,10 +203,11 @@ describe('Blocks routes', () => {
 
       assert.equal(body.pagination.page, 2)
       assert.equal(body.pagination.limit, 2)
-      assert.equal(body.pagination.total, blocks.length)
-
+      assert.equal(body.pagination.total, 24)
       const expectedBlocks = blocks
         .filter(a => a.validator === block.validator)
+        .sort((a, b) => a.height - b.height)
+        .slice(2, 4)
         .map(row => ({
           header: {
             hash: row.hash,
@@ -200,8 +219,7 @@ describe('Blocks routes', () => {
             validator: row.validator
           },
           txs: []
-        })).slice(0, 2)
-      assert.deepEqual(expectedBlocks, body.resultSet)
+        }))
     })
 
     it('should allow to walk through pages with custom page size desc', async () => {
@@ -213,10 +231,12 @@ describe('Blocks routes', () => {
 
       assert.equal(body.pagination.page, 2)
       assert.equal(body.pagination.limit, 2)
-      assert.equal(body.pagination.total, blocks.length)
+      assert.equal(body.pagination.total, 24)
 
       const expectedBlocks = blocks
+        .sort((a, b) => b.height - a.height)
         .filter(a => a.validator === block.validator)
+        .slice(2, 4)
         .map(row => ({
           header: {
             hash: row.hash,
@@ -228,7 +248,41 @@ describe('Blocks routes', () => {
             validator: row.validator
           },
           txs: []
-        })).slice(0, 2)
+        }))
+
+      assert.deepEqual(expectedBlocks, body.resultSet)
+    })
+
+    it('should return less items when it is out of bounds', async () => {
+      const page = 4
+      const limit = 7
+
+      const [block] = blocks
+
+      const { body } = await client.get(`/block/validator/${block.validator}?limit=${limit}&page=${page}&order=desc`)
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+
+      assert.equal(body.pagination.page, page)
+      assert.equal(body.pagination.limit, limit)
+      assert.equal(body.resultSet.length, 3)
+
+      const expectedBlocks = blocks
+        .sort((a, b) => b.height - a.height)
+        .filter(a => a.validator === block.validator)
+        .slice((page - 1) * limit, (page - 1) * limit + limit)
+        .map(row => ({
+          header: {
+            hash: row.hash,
+            height: row.height,
+            timestamp: row.timestamp.toISOString(),
+            blockVersion: row.block_version,
+            appVersion: row.app_version,
+            l1LockedHeight: row.l1_locked_height,
+            validator: row.validator
+          },
+          txs: []
+        }))
       assert.deepEqual(expectedBlocks, body.resultSet)
     })
 
@@ -238,7 +292,6 @@ describe('Blocks routes', () => {
       const { body } = await client.get(`/block/validator/${block.validator}?limit=20&page=99&order=desc`)
         .expect(200)
         .expect('Content-Type', 'application/json; charset=utf-8')
-      console.log(body.pagination)
       const expectedBlocks = []
       assert.deepEqual(expectedBlocks, body.resultSet)
     })
@@ -254,18 +307,21 @@ describe('Blocks routes', () => {
       assert.equal(body.pagination.total, blocks.length)
       assert.equal(body.resultSet.length, 10)
 
-      const expectedBlocks = blocks.slice(0, 10).map(row => ({
-        header: {
-          hash: row.hash,
-          height: row.height,
-          timestamp: row.timestamp.toISOString(),
-          blockVersion: row.block_version,
-          appVersion: row.app_version,
-          l1LockedHeight: row.l1_locked_height,
-          validator: row.validator
-        },
-        txs: []
-      }))
+      const expectedBlocks = blocks
+        .sort((a, b) => a.height - b.height)
+        .slice(0, 10)
+        .map(row => ({
+          header: {
+            hash: row.hash,
+            height: row.height,
+            timestamp: row.timestamp.toISOString(),
+            blockVersion: row.block_version,
+            appVersion: row.app_version,
+            l1LockedHeight: row.l1_locked_height,
+            validator: row.validator
+          },
+          txs: []
+        }))
 
       assert.deepEqual(expectedBlocks, body.resultSet)
     })
@@ -281,8 +337,8 @@ describe('Blocks routes', () => {
       assert.equal(body.resultSet.length, 10)
 
       const expectedBlocks = blocks
-        .slice(20, 30)
         .sort((a, b) => b.height - a.height)
+        .slice(0, 10)
         .map(row => ({
           header: {
             hash: row.hash,
@@ -310,6 +366,7 @@ describe('Blocks routes', () => {
       assert.equal(body.resultSet.length, 10)
 
       const expectedBlocks = blocks
+        .sort((a, b) => a.height - b.height)
         .slice(10, 20)
         .map(row => ({
           header: {
@@ -338,6 +395,7 @@ describe('Blocks routes', () => {
       assert.equal(body.resultSet.length, 7)
 
       const expectedBlocks = blocks
+        .sort((a, b) => a.height - b.height)
         .slice(0, 7)
         .map(row => ({
           header: {
@@ -366,6 +424,7 @@ describe('Blocks routes', () => {
       assert.equal(body.resultSet.length, 7)
 
       const expectedBlocks = blocks
+        .sort((a, b) => a.height - b.height)
         .slice(7, 14)
         .map(row => ({
           header: {
@@ -413,18 +472,20 @@ describe('Blocks routes', () => {
     })
 
     it('should return less items when when it is out of bounds', async () => {
-      const { body } = await client.get('/blocks?limit=7&page=5&order=desc')
+      const page = 8
+      const limit = 7
+      const { body } = await client.get(`/blocks?limit=${limit}&page=${page}&order=desc`)
         .expect(200)
         .expect('Content-Type', 'application/json; charset=utf-8')
 
-      assert.equal(body.pagination.page, 5)
-      assert.equal(body.pagination.limit, 7)
+      assert.equal(body.pagination.page, page)
+      assert.equal(body.pagination.limit, limit)
       assert.equal(body.pagination.total, blocks.length)
-      assert.equal(body.resultSet.length, 2)
+      assert.equal(body.resultSet.length, 4)
 
       const expectedBlocks = blocks
         .sort((a, b) => b.height - a.height)
-        .slice(28, 30)
+        .slice((page - 1) * limit, (page - 1) * limit + limit)
         .map(row => ({
           header: {
             hash: row.hash,
@@ -437,16 +498,15 @@ describe('Blocks routes', () => {
           },
           txs: []
         }))
-
       assert.deepEqual(expectedBlocks, body.resultSet)
     })
 
     it('should return less items when there is none on the one bound', async () => {
-      const { body } = await client.get('/blocks?limit=10&page=4&order=desc')
+      const { body } = await client.get('/blocks?limit=10&page=8&order=desc')
         .expect(200)
         .expect('Content-Type', 'application/json; charset=utf-8')
 
-      assert.equal(body.pagination.page, 4)
+      assert.equal(body.pagination.page, 8)
       assert.equal(body.pagination.limit, 10)
       assert.equal(body.pagination.total, -1)
       assert.equal(body.resultSet.length, 0)
