@@ -163,12 +163,6 @@ jobs:
     needs: [build_api, build_indexer, test_frontend, test_data_contract]
     if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
     steps:
-      # ! Get varsion from tag
-      - name: get-npm-version
-        id: package-version
-        uses: martinbeentjes/npm-get-version-action@v1.3.1
-        with:
-          path: packages/api
       # ! Checkout and bump version from package.json
       - uses: actions/checkout@v4
       - name: Bump version and push tag
@@ -176,6 +170,12 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+      # ! Get varsion from tag
+      - name: get-npm-version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+        with:
+          path: packages/api
       # ! Create release
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
@@ -184,4 +184,4 @@ jobs:
           name: Release ${{ steps.package-version.outputs.current-version}}
           body: ${{ steps.tag_version.outputs.changelog }}
       - name: Debug
-        run: echo "$steps"
+        run: echo ${{steps.package-version.outputs}}
