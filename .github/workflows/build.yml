@@ -145,7 +145,7 @@ jobs:
           foldersOnly: false 
           format: csv
       - name: Drop database
-        if: contains(steps.changes.outputs.changed, 'indexer')
+        if: contains(steps.changes.outputs.changed, 'packages/indexer/')
         run: echo "DROP db"
       - name: "DEBUG"
         run: echo ${{ steps.changes.outputs.changed }}
