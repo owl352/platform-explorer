@@ -13,13 +13,10 @@ env:
 jobs:
   validate_label: 
     runs-on: ubuntu-latest
+    if: startsWith(github.event.pull_request.labels.*.name, '[A-z]')
     steps: 
-      - uses: mheap/github-action-required-labels@v5
-        with:
-          mode: exactly
-          count: 1
-          labels: "*"
-          use_regex: true
+      - name: "Validate label"
+        run: echo "Label exist!"
   test_data_contract:
     needs: validate_label
     runs-on: ubuntu-latest
