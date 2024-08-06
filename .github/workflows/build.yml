@@ -181,18 +181,4 @@ jobs:
     steps:
       - name: Deploy to the server
         run: echo "deploy!!"
-        # uses: appleboy/ssh-action@v0.1.10
-        # with:
-        #   host: ${{ secrets.SSH_HOST }}
-        #   username: ${{ secrets.SSH_USERNAME }}
-        #   key: ${{ secrets.SSH_KEY }}
-        #   port: ${{ secrets.SSH_PORT }}
-        #   script: |
-        #     docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:api
-        #     docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:indexer
-        #     docker stop $(docker ps -f name=platform-explorer-api -q)
-        #     docker stop $(docker ps -f name=platform-explorer-indexer -q)
-        #     docker rm platform-explorer-api platform-explorer-indexer
-        #     docker run -d -p 3005:3005 --restart always --env-file api.env --name platform-explorer-api ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:api
-        #     sleep 3
-        #     docker run -d --env-file api.env --restart always --name platform-explorer-indexer ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:indexer cargo run
+        
