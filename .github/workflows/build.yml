@@ -144,7 +144,7 @@ jobs:
           foldersOnly: true 
           format: csv
       - name: Drop database
-        if: 'contains(steps.get_changed.outputs.changed, "")'
+        if: contains(steps.get_changed.outputs.changed, '')
         run: echo "DROP db"
   deploy:
     runs-on: ubuntu-latest
