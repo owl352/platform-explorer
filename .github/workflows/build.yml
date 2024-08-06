@@ -141,7 +141,8 @@ jobs:
         id: get_changed
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          foldersOnly: true 
+          ignore: "**/+(.github)"
+          foldersOnly: false 
           format: csv
       - name: Drop database
         if: contains(steps.get_changed.outputs.changed, 'indexer')
