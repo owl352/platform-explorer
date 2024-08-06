@@ -180,18 +180,16 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }} 
           sinceTag: ${{ steps.previoustag.outputs.tag }}
           output: CHANGELOG.md
-      # ! Get varsion from tag
       - name: get-npm-version
         id: package-version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
         with:
           path: packages/api
-      # ! Create release
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.package-version.outputs.current-version}}
           name: Release ${{ steps.package-version.outputs.current-version}}
-          bodyFile: /github/workspace/CHANGELOG.md
+          body: ${{steps.changelog.outputs.changelog}}
       - name: Debug
         run: echo ${{steps.changelog.outputs.changelog}}
