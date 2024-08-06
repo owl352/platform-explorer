@@ -187,7 +187,7 @@ jobs:
           securityLabel: '### 🛡️ Security'
           issuesLabel: '### 📁 Other issues'
           prLabel: '### 📁 Other pull requests'
-          addSections: '{"documentation":{"prefix":"### 📖 Documentation","labels":["documentation"]},"tests":{"prefix":"### ✅ Testing","labels":["tests"]}}'
+          addSections: '{"documentation":{"prefix":"### 📖 Indexer","labels":["indexer"]},"tests":{"prefix":"### ✅ Testing","labels":["tests"]}}'
           issues: true
           issuesWoLabels: true
           pullRequests: true
