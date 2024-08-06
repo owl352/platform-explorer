@@ -170,6 +170,14 @@ jobs:
         uses: mathieudutour/github-tag-action@v6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      # ! Generate changelog
+      - uses: BobAnkh/auto-generate-changelog@v1.2.5
+        with:
+          ACCESS_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          PATH: 'CHANGELOG.md'
+          COMMIT_MESSAGE: 'docs(CHANGELOG): update release notes'
+          TYPE: 'feat:Feature,fix:Bug Fixes,docs:Documentation,refactor:Refactor,perf:Performance Improvements'
       # ! Get varsion from tag
       - name: get-npm-version
         id: package-version
@@ -180,8 +188,8 @@ jobs:
       - name: Create a GitHub release
         uses: ncipollo/release-action@v1
         with:
-          tag: ${{ steps.tag_version.outputs.new_tag }}
+          tag: ${{ steps.package-version.outputs.current-version}}
           name: Release ${{ steps.package-version.outputs.current-version}}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          bodyFile: "CHANGELOG.md"
       - name: Debug
         run: echo ${{steps.package-version.outputs}}
