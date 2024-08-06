@@ -178,6 +178,7 @@ jobs:
         uses: saadmk11/changelog-ci@v1.1.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          release_version: ${{ steps.previoustag.outputs.tag }}
       # - name: 'Generate changelog'
       #   id: changelog
       #   uses: heinrichreimer/action-github-changelog-generator@v2.3
