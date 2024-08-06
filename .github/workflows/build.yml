@@ -173,11 +173,12 @@ jobs:
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
         with:
           fallback: 1.0.0
-      - uses: heinrichreimer/action-github-changelog-generator@v2.3
+      - name: Changelog
+        uses: scottbrenner/generate-changelog-action@master
+        id: Changelog
         with:
-          token: ${{ secrets.GITHUB_TOKEN }} 
-          sinceTag: ${{ steps.previoustag.outputs.tag }}
-          output: CHANGELOG.md
+          from-tag: ${{ steps.previoustag.outputs.tag }}
+          to-tag: HEAD
       - name: Bump version and push tag
         id: tag_version
         uses: mathieudutour/github-tag-action@v6.2
@@ -195,6 +196,6 @@ jobs:
         with:
           tag: ${{ steps.package-version.outputs.current-version}}
           name: Release ${{ steps.package-version.outputs.current-version}}
-          bodyFile: /github/workspace/CHANGELOG.md
+          body: ${{ steps.Changelog.outputs.changelog }}
       - name: Debug
         run: echo ${{steps.package-version.outputs}}
