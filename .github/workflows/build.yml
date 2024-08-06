@@ -167,6 +167,8 @@ jobs:
       - name: get-npm-version
         id: package-version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
+        with:
+          path: packages/api
       # ! Checkout and bump version from package.json
       - uses: actions/checkout@v4
       - name: Bump version and push tag
