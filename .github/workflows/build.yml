@@ -191,5 +191,3 @@ jobs:
           tag: ${{ steps.package-version.outputs.current-version}}
           name: Release ${{ steps.package-version.outputs.current-version}}
           body: ${{steps.changelog.outputs.changelog}}
-      - name: Debug
-        run: echo ${{steps.changelog.outputs.changelog}}
