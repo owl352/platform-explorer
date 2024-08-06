@@ -173,20 +173,13 @@ jobs:
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
         with:
           fallback: 1.0.0
-
-      - name: Run Changelog CI
-        id: changelog-ci
-        uses: saadmk11/changelog-ci@v1.1.2
+      - name: 'Generate changelog'
+        id: changelog
+        uses: heinrichreimer/action-github-changelog-generator@v2.3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          release_version: ${{ steps.previoustag.outputs.tag }}
-      # - name: 'Generate changelog'
-      #   id: changelog
-      #   uses: heinrichreimer/action-github-changelog-generator@v2.3
-      #   with:
-      #     token: ${{ secrets.GITHUB_TOKEN }} 
-      #     sinceTag: ${{ steps.previoustag.outputs.tag }}
-      #     output: CHANGELOG.md
+          token: ${{ secrets.GITHUB_TOKEN }} 
+          sinceTag: ${{ steps.previoustag.outputs.tag }}
+          output: CHANGELOG.md
       - name: get-npm-version
         id: package-version
         uses: martinbeentjes/npm-get-version-action@v1.3.1
@@ -197,6 +190,6 @@ jobs:
         with:
           tag: ${{ steps.package-version.outputs.current-version}}
           name: Release ${{ steps.package-version.outputs.current-version}}
-          body: ${{steps.changelog-ci.outputs.changelog}}
+          body: ${{steps.changelog.outputs.changelog}}
       - name: Debug
-        run: echo ${{steps.changelog-ci.outputs.changelog}}
+        run: echo ${{steps.changelog.outputs.changelog}}
