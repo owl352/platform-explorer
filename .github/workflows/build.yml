@@ -184,4 +184,4 @@ jobs:
           name: Release ${{ steps.package-version.outputs.current-version}}
           body: ${{ steps.tag_version.outputs.changelog }}
       - name: Debug
-        run: echo "$steps.package-version.outputs.current-version"
+        run: echo "$steps"
