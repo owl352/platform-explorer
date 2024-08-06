@@ -172,7 +172,7 @@ jobs:
     if: (github.event_name != 'pull_request' || github.event.pull_request.merged == true) && contains( github.event.pull_request.labels.*.name, 'indexer')
     steps:
       - name: Drop database
-      run: echo "DROP db"
+        run: echo "DROP db"
         
   deploy:
     runs-on: ubuntu-latest
