@@ -185,9 +185,6 @@ jobs:
         uses: martinbeentjes/npm-get-version-action@v1.3.1
         with:
           path: packages/api
-      # - name: Validate verions
-      #   run: |
-      #     if [[  ]]; then exit 0; else exit 1; fi
       - name: 'Generate changelog'
         id: changelog
         uses: heinrichreimer/action-github-changelog-generator@v2.3
@@ -202,7 +199,7 @@ jobs:
           securityLabel: '### 🛡️ Security'
           issuesLabel: '### 📁 Other issues'
           prLabel: '### 📁 Other pull requests'
-          addSections: '{"indexer":{"prefix":"### 🧩 Indexer","labels":["indexer"]},"api":{"prefix":"###📊 API","labels":["api"]},"frontend":{"prefix":"###👨‍💻 frontend","labels":["frontend"]}}'
+          addSections: '{"indexer":{"prefix":"### 🧩 Indexer","labels":["indexer"]},"api":{"prefix":"###📊 API","labels":["backend"]},"frontend":{"prefix":"###👨‍💻 frontend","labels":["frontend"]}}'
           issues: true
           issuesWoLabels: true
           pullRequests: true
