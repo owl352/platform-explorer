@@ -13,7 +13,6 @@ env:
 jobs:
   validate_label: 
     runs-on: ubuntu-latest
-    # if: startsWith(github.event.pull_request.labels.*.name, '[A-z]') || (github.event_name != 'pull_request' || github.event.pull_request.merged == true)
     steps: 
       - name: "Validate label"
         run: echo ${{github.event.label.name}}
