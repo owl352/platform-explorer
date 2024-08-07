@@ -21,7 +21,7 @@ jobs:
           contains(github.event.pull_request.labels.*.name, 'indexer') || 
           contains(github.event.pull_request.labels.*.name, 'data contract') || 
           contains(github.event.pull_request.labels.*.name, 'design') || 
-          contains(github.event.pull_request.labels.*.name, 'documentation')) == false && 
+          contains(github.event.pull_request.labels.*.name, 'documentation')) == false ||
           (github.event_name == 'pull_request' || github.event.pull_request.merged != true)          
         uses: andymckay/cancel-action@0.4
   test_data_contract:
