@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps: 
       - name: "DEBUG"
-        run: echo ${{(contains(github.event.pull_request.labels.*.name, 'backend') || contains(github.event.pull_request.labels.*.name, 'frontend') || contains(github.event.pull_request.labels.*.name, 'indexer') || contains(github.event.pull_request.labels.*.name, 'data contract') || contains(github.event.pull_request.labels.*.name, 'design') || contains(github.event.pull_request.labels.*.name, 'documentation')) == false && (github.event_name != 'pull_request')}}
+        run: echo ${{(contains(github.event.pull_request.labels.*.name, 'backend') || contains(github.event.pull_request.labels.*.name, 'frontend') || contains(github.event.pull_request.labels.*.name, 'indexer') || contains(github.event.pull_request.labels.*.name, 'data contract') || contains(github.event.pull_request.labels.*.name, 'design') || contains(github.event.pull_request.labels.*.name, 'documentation')) == false && (github.event_name == 'pull_request')}}
       - name: "Validate label"
         if: | 
           (contains(github.event.pull_request.labels.*.name, 'backend') ||
