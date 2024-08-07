@@ -2,7 +2,6 @@ name: Drop DB
 
 on:
     push:
-        branches: [ "master" ]
         tags:        
             - 'v*'
 
