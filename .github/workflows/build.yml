@@ -13,10 +13,17 @@ env:
 jobs:
   validate_label: 
     runs-on: ubuntu-latest
-    # if: startsWith(github.event.pull_request.labels.*.name, '[A-z]') || (github.event_name != 'pull_request' || github.event.pull_request.merged == true)
     steps: 
       - name: "Validate label"
-        run: echo ${{github.event.label.name}}
+        if: | 
+          (contains(github.event.pull_request.labels.*.name, 'backend') ||
+          contains(github.event.pull_request.labels.*.name, 'frontend') || 
+          contains(github.event.pull_request.labels.*.name, 'indexer') || 
+          contains(github.event.pull_request.labels.*.name, 'data contract') || 
+          contains(github.event.pull_request.labels.*.name, 'design') || 
+          contains(github.event.pull_request.labels.*.name, 'documentation')) == false && 
+          (github.event_name == 'pull_request' || github.event.pull_request.merged != true)          
+        uses: andymckay/cancel-action@0.4
   test_data_contract:
     needs: validate_label
     runs-on: ubuntu-latest
@@ -119,8 +126,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
       id-token: write
 
     steps:
@@ -132,8 +137,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio when running outside of PRs.
       id-token: write
 
     steps:
