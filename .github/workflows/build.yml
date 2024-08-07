@@ -187,7 +187,7 @@ jobs:
           path: packages/api
       - name: Validate verions
         run: |
-          if [[ ${{steps.package-version.outputs.current-version}} == ${{ steps.previoustag.outputs.tag }} ]]; then exit 0; else exit 1; fi
+          if [[ ${{steps.package-version.outputs.current-version}} != ${{ steps.previoustag.outputs.tag }} ]]; then exit 0; else exit 1; fi
       - name: 'Generate changelog'
         id: changelog
         uses: heinrichreimer/action-github-changelog-generator@v2.3
