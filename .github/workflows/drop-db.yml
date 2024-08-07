@@ -1,0 +1,37 @@
+name: Drop DB
+
+on:
+    push:
+        branches: [ "master" ]
+        tags:        
+            - '*'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs: 
+    drop_db:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Wait for tests to succeed
+          uses: lewagon/wait-on-check-action@v1.3.4
+          with:
+           ref: ${{ github.ref }}
+           running-workflow-name: 'Build and push packages'
+           repo-token: ${{ secrets.GITHUB_TOKEN }}
+           wait-interval: 10
+        - name: Checkout repository
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+        - uses: Stockopedia/action-get-changed-files@v1
+          id: changes
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            ignore: "**/+(.github)"
+            foldersOnly: false 
+            format: csv
+        - name: Drop database
+          if: contains(steps.changes.outputs.changed, 'packages/indexer/')
+          run: echo "DROP db"

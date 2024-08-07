@@ -1,0 +1,36 @@
+name: Release
+
+on:
+    push:
+        branches: [ "master" ]
+        tags:        
+            - '*'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs: 
+    create_tag:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Wait for tests to succeed
+          uses: lewagon/wait-on-check-action@v1.3.4
+          with:
+           ref: ${{ github.ref }}
+           running-workflow-name: 'Build and push packages'
+           repo-token: ${{ secrets.GITHUB_TOKEN }}
+           wait-interval: 10
+        - name: Get tag
+          id: tag
+          uses: dawidd6/action-get-tag@v1
+        - name: Checkout repository
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
+        - name: Create a GitHub release
+          uses: release-drafter/release-drafter@v6
+          with:
+            version: ${{steps.tag.outputs.tag}}
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
