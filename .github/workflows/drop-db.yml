@@ -30,13 +30,5 @@ jobs:
           uses: actions/checkout@v4
           with:
             fetch-depth: 0
-        - uses: Stockopedia/action-get-changed-files@v1
-          id: changes
-          with:
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            ignore: "**/+(.github)"
-            foldersOnly: false 
-            format: csv
         - name: Drop database
-          if: contains(steps.changes.outputs.changed, 'packages/indexer/')
           run: echo "DROP db"
