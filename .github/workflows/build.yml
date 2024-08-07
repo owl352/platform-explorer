@@ -185,6 +185,9 @@ jobs:
         uses: martinbeentjes/npm-get-version-action@v1.3.1
         with:
           path: packages/api
+      - name: Validate verions
+        run: |
+          if [[ ${{steps.package-version.outputs.current-version}} == ${{ steps.previoustag.outputs.tag }} ]]; then exit 0; else exit 1; fi
       - name: 'Generate changelog'
         id: changelog
         uses: heinrichreimer/action-github-changelog-generator@v2.3
@@ -221,7 +224,6 @@ jobs:
       - name: DEBUG package
         run: echo ${{steps.package-version.outputs.current-version}}
       - name: Create a GitHub release
-        if: ${{steps.package-version.outputs.current-version}} != ${{ steps.previoustag.outputs.tag }}
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.package-version.outputs.current-version}}
