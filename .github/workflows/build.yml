@@ -221,8 +221,7 @@ jobs:
         run: echo ${{steps.package-version.outputs.current-version}}
       - name: Create a GitHub release
         if: ${{steps.package-version.outputs.current-version != steps.previoustag.outputs.tag }}
-        uses: K-Phoen/semver-release-action@master
-        with:
-          release_branch: master
+        uses: release-drafter/release-drafter@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
