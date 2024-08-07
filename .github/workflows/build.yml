@@ -24,7 +24,7 @@ jobs:
             contains(github.event.pull_request.labels.*.name, 'data contract') || 
             contains(github.event.pull_request.labels.*.name, 'design') || 
             contains(github.event.pull_request.labels.*.name, 'documentation')) == false &&
-          (github.event_name != 'pull_request')        
+          (github.event_name == 'pull_request')        
         run: exit 1
       
   test_data_contract:
