@@ -222,8 +222,9 @@ jobs:
         run: echo ${{steps.package-version.outputs.current-version}}
       - name: Create a GitHub release
         if: ${{steps.package-version.outputs.current-version != steps.previoustag.outputs.tag }}
-        uses: ncipollo/release-action@v1
+        uses: K-Phoen/semver-release-action@master
         with:
-          tag: ${{ steps.package-version.outputs.current-version}}
-          name: Release ${{ steps.package-version.outputs.current-version}}
-          body: ${{steps.changelog.outputs.changelog}}
+          release_branch: master
+          tag: ${{steps.package-version.outputs.current-version}}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
