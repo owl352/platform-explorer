@@ -6,7 +6,6 @@ on:
     branches: 
       - "master"
       - "*.*.*"
-      - "*.*.*.*"
     types: 
       - completed
 
@@ -20,8 +19,6 @@ jobs:
   stop:
     runs-on: ubuntu-latest
 
-    if: github.event_name == 'merge'
-    
     steps:
       - name: Stop
         uses: appleboy/ssh-action@v0.1.10
