@@ -45,6 +45,8 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: DEBUG
+        run: echp ${{github.ref_name}}
       - name: Drop database
         if: ${{startsWith(github.ref_name,'*.*.*')}}
         uses: appleboy/ssh-action@v0.1.10
