@@ -13,10 +13,10 @@ on:
 jobs: 
   create_tag:
     runs-on: ubuntu-latest
-    
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
     steps:
     - name: Wait for tests to succeed
+      if: ${{ github.event.workflow_run.conclusion == 'success' }}
       uses: lewagon/wait-on-check-action@v1.3.4
       with:
         ref: ${{ github.ref }}

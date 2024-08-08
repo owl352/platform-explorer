@@ -16,10 +16,10 @@ jobs:
   drop_db:
       runs-on: ubuntu-latest
 
-      if: ${{ github.event.workflow_run.conclusion == 'success' }}
       steps:
-
+        
       - name: Checkout repository
+        if: ${{ github.event.workflow_run.conclusion == 'success' }}
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
