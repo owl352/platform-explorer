@@ -69,6 +69,7 @@ jobs:
       contents: read
       packages: write
       id-token: write
+    if: startsWith(${{github.ref_name}}, 'v*') || github.ref_name == 'master'
 
     steps:
       - name: Checkout repository
@@ -81,7 +82,7 @@ jobs:
       contents: read
       packages: write
       id-token: write
-
+    if: startsWith(${{github.ref_name}}, 'v*') || github.ref_name == 'master'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
