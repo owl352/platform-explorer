@@ -16,7 +16,7 @@ jobs:
   drop_db:
       runs-on: ubuntu-latest
 
-      if: startsWith(${{github.ref_name}},'v*')
+      if: ${{ github.event.workflow_run.conclusion == 'success' }}
       steps:
 
       - name: Checkout repository
