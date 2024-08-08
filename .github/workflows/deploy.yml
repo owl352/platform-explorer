@@ -33,7 +33,6 @@ jobs:
           script: |
             docker stop $(docker ps -f name=platform-explorer-indexer -q)
             docker stop $(docker ps -f name=platform-explorer-api -q)
-            docker stop $(docker ps -f name=platform-explorer-indexer -q)
             docker rm platform-explorer-api platform-explorer-indexer
 
   drop_db:
