@@ -1,12 +1,10 @@
 name: Release
-
 on:
   workflow_run:
     workflows: ["Build and push packages"]
     branches: ['*.*.*']
     types: 
       - completed
-
 jobs: 
   create_tag:
     runs-on: ubuntu-latest
