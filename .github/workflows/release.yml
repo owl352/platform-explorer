@@ -1,9 +1,11 @@
 name: Release
 
 on:
-  push:
-    tags:        
-      - 'v*'
+  workflow_run:
+    workflows: ["Build and push packages"]
+    branches: [v*]
+    types: 
+      - completed
 
 jobs: 
   create_tag:
