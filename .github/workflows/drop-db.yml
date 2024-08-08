@@ -1,12 +1,9 @@
 name: Drop DB
 
 on:
-  push:
-      tags:        
-          - 'v*'
   workflow_run:
       workflows: ["Build and push packages"]
-      branches: [main]
+      branches: [master]
       types: 
       - completed
 
@@ -18,6 +15,8 @@ env:
 jobs: 
   drop_db:
       runs-on: ubuntu-latest
+
+      if: startsWith(${{github.ref_name}},'v*')
       steps:
 
       - name: Checkout repository
