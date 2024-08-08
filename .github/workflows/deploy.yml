@@ -52,3 +52,32 @@ jobs:
             docker run -d -p 3005:3005 --restart always --env-file api.env --name platform-explorer-api ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:api
             sleep 3
             docker run -d --env-file api.env --restart always --name platform-explorer-indexer ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:indexer ./indexer
+            
+  drop_db:
+      runs-on: ubuntu-latest
+
+      if: github.event.workflow_run.conclusion == 'success'  && startsWith(github.ref_name,'v*')
+      steps:
+      - name: DEBUG
+        run: echo ${{github.ref_name}}
+      
+        
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Drop database
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            git -C ./platform-explorer pull
+            docker pull owl352/refinery_cli_docker
+            docker stop $(docker ps -f name=platform-explorer-api -q)
+            docker stop $(docker ps -f name=platform-explorer-indexer -q)
+            docker run --rm --env-file api.env ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:api npm run db:drop
+            docker run --rm --env-file api.env ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:indexer refinery migrate -e DATABASE_URL -p /app/migrations
