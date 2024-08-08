@@ -6,7 +6,6 @@ on:
     branches: ['*.*.*']
     types: 
       - completed
-
 jobs: 
   create_tag:
     runs-on: ubuntu-latest
