@@ -46,7 +46,7 @@ jobs:
           fetch-depth: 0
       
       - name: DEBUG
-        run: echo "Works. Tag is ${github.event.workflow_run.head_branch}"
+        run: echo "Works. Tag is ${{github.event.workflow_run.head_branch}}"
 
       - name: Drop database
         if: ${{startsWith(github.ref_name,'*.*.*')}}
