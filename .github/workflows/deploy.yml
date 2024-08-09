@@ -57,7 +57,7 @@ jobs:
         run: echo "Works. Tag is ${{github.event.workflow_run.head_branch}}"
 
       - name: DEBUG#1
-        run: echo ${{steps.check-tag.outputs.match}}
+        run: echo ${{steps.regex-match.outputs.match}}
 
       - name: DEBUG#2
         run: echo ${{startsWith(github.event.workflow_run.head_branch, env.SEMVER_REGEX)}}
