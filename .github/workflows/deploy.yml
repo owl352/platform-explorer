@@ -53,17 +53,8 @@ jobs:
           text: ${{ github.event.workflow_run.head_branch }}
           regex: ${{env.SEMVER_REGEX}}
 
-      - name: DEBUG
-        run: echo "Works. Tag is ${{github.event.workflow_run.head_branch}}"
-
-      - name: DEBUG#1
-        run: echo ${{steps.regex-match.outputs.match}}
-
-      - name: DEBUG#2
-        run: echo ${{startsWith(github.event.workflow_run.head_branch, env.SEMVER_REGEX)}}
-
       - name: Drop database
-        if: ${{startsWith(github.event.workflow_run.head_branch,'*.*.*')}}
+        if: ${{steps.regex-match.outputs.match != ''}}
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.SSH_HOST }}
