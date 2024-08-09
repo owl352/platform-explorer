@@ -46,8 +46,19 @@ jobs:
         with:
           fetch-depth: 0
       
+
+      - name: Check Tag
+        id: check-tag
+        run: |
+          if [[ ${{ github.event.workflow_run.head_branch }} =~ ${{env.SEMVER_REGEX}}]]; then
+              echo "match=true" >> $GITHUB_OUTPUT
+          fi
+
       - name: DEBUG
         run: echo "Works. Tag is ${{github.event.workflow_run.head_branch}}"
+
+      - name: DEBUG#1
+        run: echo ${{steps.check-tag.outputs.match}}
 
       - name: DEBUG#2
         run: echo ${{startsWith(github.event.workflow_run.head_branch, env.SEMVER_REGEX)}}
