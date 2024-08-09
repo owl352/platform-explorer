@@ -45,6 +45,15 @@ jobs:
         with:
           fetch-depth: 0
       
+      - name: DEBUG
+        run: echo "Works. Tag is ${{github.event.workflow_run.head_branch}}"
+
+      - name: DEBUG#2
+        run: echo ${{startsWith(github.event.workflow_run.head_branch,'*.*.*')}}
+
+      - name: DEBUG#2
+        run: echo ${{startsWith(github.event.workflow_run.head_branch,'*.*.*')}}
+
       - name: Drop database
         if: ${{startsWith(github.event.workflow_run.head_branch,'*.*.*')}}
         uses: appleboy/ssh-action@v0.1.10
