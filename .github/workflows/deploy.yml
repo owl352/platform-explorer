@@ -12,6 +12,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  SEMVER_REGEX: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
 
 
 
@@ -49,10 +50,7 @@ jobs:
         run: echo "Works. Tag is ${{github.event.workflow_run.head_branch}}"
 
       - name: DEBUG#2
-        run: echo ${{startsWith(github.event.workflow_run.head_branch,'*.*.*')}}
-
-      - name: DEBUG#2
-        run: echo ${{startsWith(github.event.workflow_run.head_branch,'*.*.*')}}
+        run: echo ${{startsWith(github.event.workflow_run.head_branch, env.SEMVER_REGEX)}}
 
       - name: Drop database
         if: ${{startsWith(github.event.workflow_run.head_branch,'*.*.*')}}
