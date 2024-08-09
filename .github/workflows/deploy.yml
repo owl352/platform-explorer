@@ -66,7 +66,7 @@ jobs:
             docker pull owl352/refinery_cli_docker
             
             docker run --rm --env-file api.env ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:api npm run db:drop
-            docker run --rm --env-file api.env ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:indexer refinery migrate -e DATABASE_URL -p /app/migrations
+            docker run --rm --env-file api.env -v ./platform-explorer/packages/indexer/migrations:/migrations owl352/refinery_cli_docker refinery migrate -e DATABASE_URL -p /migrations
 
   start:
     runs-on: ubuntu-latest
@@ -88,7 +88,7 @@ jobs:
           script: |
             git -C ./platform-explorer pull
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:api
-            docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:indexer
+            docker pull ghcr.io/pshenmic/platform-explorer:indexer
             docker run -d -p 3005:3005 --restart always --env-file api.env --name platform-explorer-api ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:api
             sleep 3
             docker run -d --env-file api.env --restart always --name platform-explorer-indexer ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:indexer cargo run
