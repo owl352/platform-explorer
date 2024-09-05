@@ -4,19 +4,19 @@ on:
   workflow_run:
     workflows: ["Build and push packages"]
     branches: ['*.*.*']
-    types: 
+    types:
       - completed
 
-jobs: 
+jobs:
   create_tag:
     runs-on: ubuntu-latest
 
     if: github.event.workflow_run.conclusion == 'success'
-    
+
     steps:
     - uses: actions/checkout@v3
       with:
-        fetch-depth: 0 
+        fetch-depth: 0
 
     - name: 'Get Previous tag'
       id: previoustag
@@ -31,5 +31,6 @@ jobs:
       uses: release-drafter/release-drafter@v6
       with:
         version: ${{ steps.previoustag.outputs.tag }}
+        publish: 'true'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
