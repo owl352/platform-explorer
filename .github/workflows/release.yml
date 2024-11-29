@@ -1,5 +1,4 @@
 name: Release
-
 on:
   workflow_run:
     workflows: ["Build and push packages"]
@@ -8,6 +7,7 @@ on:
       - completed
 
 jobs:
+
   create_tag:
     runs-on: ubuntu-latest
 
