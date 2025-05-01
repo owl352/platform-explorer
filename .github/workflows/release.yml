@@ -22,7 +22,7 @@ jobs:
     - name: 'Get Previous tag'
       id: previoustag
       uses: "WyriHaximus/github-action-get-previous-tag@v1"
-#
+
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
@@ -32,6 +32,6 @@ jobs:
       uses: release-drafter/release-drafter@v6
       with:
         version: ${{ steps.previoustag.outputs.tag }}
-        publish: 'true'
+        publish: 'false'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
